@@ -1,0 +1,107 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
+    id "kotlin-kapt"
+    id "dagger.hilt.android.plugin"
+}
+apply from : '../dependencies.gradle'
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.bruno.topheadlines"
+        minSdk 28
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+    flavorDimensions "company"
+    productFlavors {
+        bbc {
+            dimension "company"
+            applicationIdSuffix ".bbc"
+            manifestPlaceholders.appName = "BBC"
+            buildConfigField "String", "SOURCE_NAME", BBC
+        }
+        theguardian {
+            dimension "company"
+            applicationIdSuffix ".theguardian"
+            manifestPlaceholders.appName = "The Guardian"
+            buildConfigField "String", "SOURCE_NAME", THE_GUARDIAN
+        }
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "String", "BASE_URL", BASE_URL
+            buildConfigField "String", "API_KEY", API_KEY
+        }
+        release {
+            minifyEnabled false
+            buildConfigField "String", "BASE_URL", BASE_URL
+            buildConfigField "String", "API_KEY", API_KEY
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion Version.compose
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    implementation "androidx.core:core-ktx:${Version.core}"
+    implementation "androidx.compose.ui:ui:${Version.compose}"
+    implementation "androidx.compose.material:material:${Version.compose}"
+    implementation "androidx.compose.ui:ui-tooling-preview:${Version.compose}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${Version.lifecycle}"
+    implementation "androidx.activity:activity-compose:${Version.activityCompose}"
+    implementation "com.squareup.retrofit2:retrofit:${Version.retrofit}"
+    implementation "com.squareup.retrofit2:converter-gson:${Version.retrofit}"
+    implementation "androidx.test:core:1.4.0"
+    implementation "androidx.test:rules:1.4.0"
+    implementation "androidx.test:runner:1.4.0"
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
+    implementation "io.coil-kt:coil-compose:${Version.coil}"
+    implementation "io.coil-kt:coil:${Version.coil}"
+    implementation "com.google.dagger:hilt-android:${Version.hilt}"
+    implementation "androidx.navigation:navigation-compose:${Version.navigationCompose}"
+    kapt "com.google.dagger:hilt-android-compiler:${Version.hilt}"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
+    testImplementation "io.mockk:mockk:${Version.mockk}"
+    testImplementation "junit:junit:${Version.junit}"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation "androidx.test.espresso:espresso-core:${Version.espresso}"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:${Version.compose}"
+    debugImplementation "androidx.compose.ui:ui-tooling:${Version.compose}"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:${Version.compose}"
+}

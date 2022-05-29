@@ -1,0 +1,14 @@
+ext.Version = [
+        hilt             : "2.38.1",
+        coil             : "2.1.0",
+        retrofit         : "2.9.0",
+        compose          : "1.2.0-beta02",
+        lifecycle        : "2.4.1",
+        activityCompose  : "1.4.0",
+        junit            : "4.13.2",
+        espresso         : "3.4.0",
+        core             : "1.7.0",
+        navigationCompose: "2.4.2",
+        mockk            : "1.12.4",
+        coroutine        : "1.6.1"
+]

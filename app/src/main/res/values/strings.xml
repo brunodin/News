@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Top Headlines</string>
+    <string name="authors">Autor: %s</string>
+    <string name="published">Publicado %s em %s</string>
+</resources>
