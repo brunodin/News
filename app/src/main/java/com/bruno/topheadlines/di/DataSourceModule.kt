@@ -15,6 +15,6 @@ class DataSourceModule {
 
     @Provides
     fun provideNewsRemoteDataSource(api: NewsApi): NewsRemoteDataSource {
-        return NewsRetrofitDataSourceImpl(newsApi = api, BuildConfig.SOURCE_NAME)
+        return NewsRetrofitDataSourceImpl(newsApi = api, source = BuildConfig.SOURCE_NAME)
     }
 }
