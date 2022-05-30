@@ -23,24 +23,17 @@ android {
     }
     flavorDimensions "company"
     productFlavors {
-        bbc {
+        cnn {
             dimension "company"
-            applicationIdSuffix ".bbc"
-            manifestPlaceholders.appName = "BBC"
-            buildConfigField "String", "SOURCE_NAME", BBC
+            applicationIdSuffix ".cnn"
+            manifestPlaceholders.appName = "CNN"
+            buildConfigField "String", "SOURCE_NAME", CNN
         }
-        theguardian {
+        globo {
             dimension "company"
-            applicationIdSuffix ".theguardian"
-            manifestPlaceholders.appName = "The Guardian"
-            buildConfigField "String", "SOURCE_NAME", THE_GUARDIAN
-        }
-    }
-
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-            returnDefaultValues = true
+            applicationIdSuffix ".globo"
+            manifestPlaceholders.appName = "Globo"
+            buildConfigField "String", "SOURCE_NAME", GLOBO
         }
     }
 
@@ -90,7 +83,6 @@ dependencies {
     implementation "androidx.test:rules:1.4.0"
     implementation "androidx.test:runner:1.4.0"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
-    implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
     implementation "io.coil-kt:coil-compose:${Version.coil}"
     implementation "io.coil-kt:coil:${Version.coil}"
     implementation "com.google.dagger:hilt-android:${Version.hilt}"

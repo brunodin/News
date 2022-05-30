@@ -18,7 +18,6 @@ class NewsViewModel @Inject constructor(): ViewModel(), EventFlow<Navigation> by
         viewModelScope.sendEvent(navigation)
     }
 
-
     sealed class Navigation(val router: String) {
         object TopHeadlines : Navigation("top_headlines")
         object Details : Navigation("details")

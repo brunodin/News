@@ -9,6 +9,6 @@ interface NewsApi {
     @GET("v2/top-headlines")
     suspend fun getHeadlines(
         @Query("sources") sources: String,
-        @Query("page") page: Int
+        @Query("page") page: Int,
     ): NewsResponse
 }

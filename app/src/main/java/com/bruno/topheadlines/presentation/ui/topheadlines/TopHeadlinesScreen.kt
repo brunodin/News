@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,8 +16,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -29,43 +32,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.bruno.topheadlines.BuildConfig
+import com.bruno.topheadlines.R
 import com.bruno.topheadlines.domain.model.Article
-import com.bruno.topheadlines.presentation.theme.Primary100
-import com.bruno.topheadlines.presentation.theme.Secondary100
-import com.bruno.topheadlines.presentation.theme.Secondary200
+import com.bruno.topheadlines.presentation.main.NewsViewModel
+import com.bruno.topheadlines.presentation.theme.Dimension
 import com.bruno.topheadlines.presentation.theme.TopHeadlinesTheme
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.ArticleClickedAction
+import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.EndReachedAction
+import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.RetryAction
+import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesUiState.ScreenState
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesViewModel.ScreenEvent
+import com.bruno.topheadlines.util.rememberEndReachedState
 
 @Composable
 fun TopHeadlinesScreen(
     viewModel: TopHeadlinesViewModel = hiltViewModel(),
-    onNext: (Article) -> Unit,
+    sharedViewModel: NewsViewModel,
 ) {
     Screen(
         uiState = viewModel.uiState,
         onAction = viewModel::onAction
     )
-    EventConsumer(onNext = onNext, viewModel = viewModel)
+    EventConsumer(viewModel = viewModel, sharedViewModel = sharedViewModel)
 }
 
 @Composable
 private fun EventConsumer(
-    onNext: (Article) -> Unit,
-    viewModel: TopHeadlinesViewModel
+    viewModel: TopHeadlinesViewModel,
+    sharedViewModel: NewsViewModel
 ) {
     LaunchedEffect(key1 = Unit) {
-        viewModel.eventFlow.collect {event ->
-            when(event) {
-                is ScreenEvent.NavigateTo -> onNext(event.article)
+        viewModel.eventFlow.collect { event ->
+            when (event) {
+                is ScreenEvent.NavigateTo -> sharedViewModel.navigate(event.navigation)
+                is ScreenEvent.SaveArticle -> sharedViewModel.article = event.article
             }
         }
     }
@@ -76,23 +85,21 @@ private fun Screen(
     uiState: TopHeadlinesUiState,
     onAction: (TopHeadlinesAction) -> Unit
 ) {
+    val screenState = uiState.screenState.collectAsState().value
     TopHeadlinesTheme {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Secondary100)
+                .background(color = MaterialTheme.colors.background)
         ) {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = BuildConfig.SOURCE_NAME,
-                        style = MaterialTheme.typography.h5,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                backgroundColor = Primary100
-            )
-            ScreenContent(uiState = uiState, onAction = onAction)
+            ToolBar()
+            when (screenState) {
+                is ScreenState.Failure ->  ScreenError(
+                    onRetryClicked = { onAction(RetryAction(screenState.retryAction)) }
+                )
+                ScreenState.Loading -> ScreenLoading()
+                ScreenState.ShowScreen -> ScreenContent(uiState = uiState, onAction = onAction)
+            }
         }
     }
 }
@@ -103,11 +110,94 @@ private fun ScreenContent(
     onAction: (TopHeadlinesAction) -> Unit
 ) {
     val articles by uiState.articles.collectAsState()
-    LazyColumn {
+    val isLoading by uiState.isLoading.collectAsState()
+    LazyColumn(
+        state = rememberEndReachedState(onEndReached = { onAction(EndReachedAction) })
+    ) {
         articlesList(articles = articles, onAction = onAction)
-        item {
-            Spacer(modifier = Modifier.height(10.dp))
+        if (isLoading) bottomLoading()
+    }
+}
+
+@Composable
+private fun ScreenLoading() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgress()
+        Spacer(modifier = Modifier.height(height = Dimension.SizeSM))
+        Text(
+            text = stringResource(id = R.string.loading),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun ScreenError(onRetryClicked: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+        Text(
+            text = stringResource(id = R.string.error),
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(height = Dimension.SizeMD))
+        Button(
+            onClick = onRetryClicked,
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondaryVariant)
+        ) {
+            Text(
+                text = stringResource(id = R.string.retry),
+                style = MaterialTheme.typography.body1
+            )
         }
+    }
+}
+
+@Composable
+private fun ToolBar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = MaterialTheme.typography.h5,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        backgroundColor = MaterialTheme.colors.primary
+    )
+}
+
+@Composable
+private fun CircularProgress() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = Dimension.SizeSM),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+private fun LazyListScope.bottomLoading() {
+    item {
+        CircularProgress()
+    }
+}
+
+private fun LazyListScope.emptyListWarning() {
+    item {
+        CircularProgress()
     }
 }
 
@@ -117,43 +207,49 @@ private fun LazyListScope.articlesList(
 ) {
     items(articles) { article ->
         Card(
-            elevation = 10.dp,
-            shape = RoundedCornerShape(6.dp),
-            border = BorderStroke(width = 1.dp, color = Secondary200),
+            elevation = Dimension.SizeSM,
+            shape = MaterialTheme.shapes.medium,
+            border = BorderStroke(
+                width = Dimension.SizeXSM,
+                color = MaterialTheme.colors.secondaryVariant
+            ),
             modifier = Modifier
-                .padding(top = 10.dp, end = 10.dp, start = 10.dp)
+                .padding(top = Dimension.SizeSM, end = Dimension.SizeSM, start = Dimension.SizeSM)
                 .clickable { onAction(ArticleClickedAction(article)) }
         ) {
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(height = Dimension.SizeMD))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(130.dp)
-                    .padding(all = 10.dp),
+                    .height(height = Dimension.SizeLG)
+                    .padding(all = Dimension.SizeSM),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(article.urlToImage)
+                            .data(data = article.urlToImage)
                             .build()
                     ),
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
                     modifier = Modifier
                         .size(110.dp)
-                        .clip(shape = RoundedCornerShape(5.dp)),
+                        .clip(shape = MaterialTheme.shapes.medium),
                 )
                 Text(
-                    modifier = Modifier.padding(start = 10.dp),
+                    modifier = Modifier.padding(start = Dimension.SizeSM),
                     text = article.title,
                     style = MaterialTheme.typography.h6,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 4
                 )
             }
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(height = Dimension.SizeMD))
         }
+    }
+    item {
+        Spacer(modifier = Modifier.height(height = Dimension.SizeSM))
     }
 }
 

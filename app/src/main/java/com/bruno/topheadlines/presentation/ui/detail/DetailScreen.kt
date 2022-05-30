@@ -2,7 +2,6 @@ package com.bruno.topheadlines.presentation.ui.detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.IconButton
@@ -23,7 +21,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -31,20 +28,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.bruno.topheadlines.R
-import com.bruno.topheadlines.presentation.main.NewsViewModel
 import com.bruno.topheadlines.presentation.main.NewsActivity
-import com.bruno.topheadlines.presentation.theme.Primary100
-import com.bruno.topheadlines.presentation.theme.Secondary100
-import com.bruno.topheadlines.presentation.theme.Secondary200
+import com.bruno.topheadlines.presentation.main.NewsViewModel
+import com.bruno.topheadlines.presentation.theme.Dimension
 import com.bruno.topheadlines.presentation.theme.TopHeadlinesTheme
 import com.bruno.topheadlines.presentation.ui.detail.DetailAction.BackButtonAction
-import com.bruno.topheadlines.presentation.ui.detail.DetailViewModel.*
+import com.bruno.topheadlines.presentation.ui.detail.DetailViewModel.ScreenEvent
 import com.bruno.topheadlines.util.formatToDayMonthYear
 import com.bruno.topheadlines.util.formatToHour
 
@@ -83,28 +76,27 @@ private fun Screen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = Secondary100)
+                .background(color = MaterialTheme.colors.background)
         ) {
             TopAppBar(
-                title = {},
-                navigationIcon = {
-                    IconButton(onClick = { onAction(BackButtonAction) }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = null,
-                            colorFilter = ColorFilter.tint(color = Color.White)
-                        )
-                    }
-                },
-                backgroundColor = Primary100
-            )
+                backgroundColor = MaterialTheme.colors.primary
+            ) {
+                IconButton(onClick = { onAction(BackButtonAction) }) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_arrow_back),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(color = MaterialTheme.colors.secondary)
+                    )
+                }
+            }
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(space = 10.dp)
+                    .padding(horizontal = Dimension.SizeSM),
+                verticalArrangement = Arrangement.spacedBy(space = Dimension.SizeSM)
             ) {
                 Text(
+                    modifier = Modifier.padding(top = Dimension.SizeSM),
                     text = article?.title.orEmpty(),
                     style = MaterialTheme.typography.h4,
                     fontWeight = FontWeight.Bold
@@ -124,9 +116,9 @@ private fun Screen(
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
                     modifier = Modifier
-                        .height(300.dp)
+                        .height(height = Dimension.SizeXLG)
                         .fillMaxSize()
-                        .clip(shape = RoundedCornerShape(5.dp)),
+                        .clip(shape = MaterialTheme.shapes.medium),
                 )
                 Text(
                     modifier = Modifier.fillMaxWidth(),
@@ -143,10 +135,11 @@ private fun Screen(
                     style = MaterialTheme.typography.h5,
                 )
                 Divider(
-                    thickness = 1.dp,
-                    color = Secondary200
+                    thickness = Dimension.SizeXSM,
+                    color = MaterialTheme.colors.secondaryVariant
                 )
                 Text(
+                    modifier = Modifier.padding(bottom = Dimension.SizeMD),
                     text = article?.content.orEmpty(),
                     style = MaterialTheme.typography.h5,
                 )
