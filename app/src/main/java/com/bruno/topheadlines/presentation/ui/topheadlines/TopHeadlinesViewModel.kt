@@ -1,5 +1,6 @@
 package com.bruno.topheadlines.presentation.ui.topheadlines
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bruno.topheadlines.domain.model.Article
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class TopHeadlinesViewModel @Inject constructor(
-    private val getHeadlinesUseCase: GetHeadlinesUseCase,
+    private val getHeadlinesUseCase: GetHeadlinesUseCase
 ) : ViewModel(), EventFlow<ScreenEvent> by EventFlowImpl() {
 
     val uiState = TopHeadlinesUiState()
@@ -30,14 +31,14 @@ class TopHeadlinesViewModel @Inject constructor(
     private val articles: ArrayList<Article> = arrayListOf()
     private var page = INITIAL_PAGE
 
-    init {
+    fun setup() {
         performFirstPaginationRequest()
     }
 
     fun onAction(action: TopHeadlinesAction) {
         when (action) {
             is ArticleClickedAction -> performNavigationToNextScreen(action.article)
-            is TopHeadlinesAction.RetryAction -> handleRetryAction(action.retryAction)
+            is TopHeadlinesAction.RetryButtonAction -> handleRetryAction(action.retryAction)
             EndReachedAction -> performNextPaginationRequest()
         }
     }
@@ -89,6 +90,13 @@ class TopHeadlinesViewModel @Inject constructor(
                 is Result.Success -> onSuccess(result.data)
             }
         }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupVariables(news: News, articles: List<Article>, page: Int) {
+        this.news = news
+        this.articles.addAll(articles)
+        this.page = page
     }
 
     private object Constants {

@@ -116,7 +116,7 @@ private fun Screen(
                     contentScale = ContentScale.Crop,
                     contentDescription = null,
                     modifier = Modifier
-                        .height(height = Dimension.SizeXLG)
+                        .height(height = Dimension.Size2XLG)
                         .fillMaxSize()
                         .clip(shape = MaterialTheme.shapes.medium),
                 )

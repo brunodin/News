@@ -2,6 +2,7 @@
     <string name="authors">Autor: %s</string>
     <string name="published">Publicado %s em %s</string>
     <string name="error">Ops... Ocorreu um erro</string>
+    <string name="empty_list">Ops... Não encontramos nenhuma noticia</string>
     <string name="retry">Tentar novamente</string>
     <string name="loading">Carregando ... \nAguarde um momento</string>
 </resources>

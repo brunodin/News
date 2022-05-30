@@ -31,17 +31,17 @@ class NewsRetrofitDataSourceTest {
     @Test
     fun `when getHeadlines is called then request is successful`() = runTest {
         //Prepare
-        coEvery { api.getHeadlines(page = PAGE, source = SOURCE) } returns NewsResponse.mock()
+        coEvery { api.getHeadlines(page = PAGE, sources = SOURCE) } returns NewsResponse.mock()
         //Action
         val result = datasource.getHeadlines(PAGE)
         //Check
-        coVerify(exactly = 1) { api.getHeadlines(page = PAGE, source = SOURCE) }
+        coVerify(exactly = 1) { api.getHeadlines(page = PAGE, sources = SOURCE) }
         Assert.assertEquals(NewsResponse.mock(), result)
     }
 
     @Test(expected = SocketTimeoutException::class)
     fun `when getHeadlines is called then request fails`() = runTest {
-        coEvery { api.getHeadlines(page = PAGE, source = SOURCE) } throws SocketTimeoutException()
+        coEvery { api.getHeadlines(page = PAGE, sources = SOURCE) } throws SocketTimeoutException()
         //Action
         datasource.getHeadlines(PAGE)
     }

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -48,7 +49,7 @@ import com.bruno.topheadlines.presentation.theme.Dimension
 import com.bruno.topheadlines.presentation.theme.TopHeadlinesTheme
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.ArticleClickedAction
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.EndReachedAction
-import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.RetryAction
+import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesAction.RetryButtonAction
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesUiState.ScreenState
 import com.bruno.topheadlines.presentation.ui.topheadlines.TopHeadlinesViewModel.ScreenEvent
 import com.bruno.topheadlines.util.rememberEndReachedState
@@ -58,6 +59,7 @@ fun TopHeadlinesScreen(
     viewModel: TopHeadlinesViewModel = hiltViewModel(),
     sharedViewModel: NewsViewModel,
 ) {
+    LaunchedEffect(key1 = Unit) { viewModel.setup() }
     Screen(
         uiState = viewModel.uiState,
         onAction = viewModel::onAction
@@ -95,7 +97,7 @@ private fun Screen(
             ToolBar()
             when (screenState) {
                 is ScreenState.Failure ->  ScreenError(
-                    onRetryClicked = { onAction(RetryAction(screenState.retryAction)) }
+                    onRetryClicked = { onAction(RetryButtonAction(screenState.retryAction)) }
                 )
                 ScreenState.Loading -> ScreenLoading()
                 ScreenState.ShowScreen -> ScreenContent(uiState = uiState, onAction = onAction)
@@ -111,11 +113,15 @@ private fun ScreenContent(
 ) {
     val articles by uiState.articles.collectAsState()
     val isLoading by uiState.isLoading.collectAsState()
-    LazyColumn(
-        state = rememberEndReachedState(onEndReached = { onAction(EndReachedAction) })
-    ) {
-        articlesList(articles = articles, onAction = onAction)
-        if (isLoading) bottomLoading()
+    if (articles.isNotEmpty()) {
+        LazyColumn(
+            state = rememberEndReachedState(onEndReached = { onAction(EndReachedAction) })
+        ) {
+            articlesList(articles = articles, onAction = onAction)
+            if (isLoading) bottomLoading()
+        }
+    } else {
+        EmptyListWarning()
     }
 }
 
@@ -178,6 +184,29 @@ private fun ToolBar() {
 }
 
 @Composable
+private fun EmptyListWarning() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_sad_face),
+            contentDescription = null,
+            modifier = Modifier.size(size = Dimension.SizeLG)
+        )
+        Spacer(modifier = Modifier.height(height = Dimension.SizeMD))
+        Text(
+            textAlign = TextAlign.Center,
+            text = stringResource(id = R.string.empty_list),
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
 private fun CircularProgress() {
     Row(
         modifier = Modifier
@@ -190,12 +219,6 @@ private fun CircularProgress() {
 }
 
 private fun LazyListScope.bottomLoading() {
-    item {
-        CircularProgress()
-    }
-}
-
-private fun LazyListScope.emptyListWarning() {
     item {
         CircularProgress()
     }
@@ -221,7 +244,7 @@ private fun LazyListScope.articlesList(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height = Dimension.SizeLG)
+                    .height(height = Dimension.SizeXLG)
                     .padding(all = Dimension.SizeSM),
                 verticalAlignment = Alignment.CenterVertically
             ) {

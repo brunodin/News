@@ -11,14 +11,14 @@ class TopHeadlinesUiState(
 ) {
 
     fun onFailure(retryAction: RetryAction) {
-        this.isLoading.value = false
         this.screenState.value = ScreenState.Failure(retryAction)
+        this.isLoading.value = false
     }
 
     fun onSuccess(articles: List<Article>) {
+        this.articles.value = articles
         this.isLoading.value = false
         this.screenState.value = ScreenState.ShowScreen
-        this.articles.value = articles
     }
 
     sealed class ScreenState {
