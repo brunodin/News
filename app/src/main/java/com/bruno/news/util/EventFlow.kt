@@ -16,7 +16,6 @@ class EventFlowImpl<T> : EventFlow<T> {
     private val eventChannel = Channel<T>(Channel.BUFFERED)
     override val eventFlow = eventChannel.receiveAsFlow()
 
-
     override fun CoroutineScope.sendEvent(event: T) = launch {
             eventChannel.send(event)
     }

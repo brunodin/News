@@ -1,6 +1,5 @@
 package com.bruno.news.presentation.ui.topheadlines
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -55,7 +54,6 @@ import com.bruno.news.presentation.ui.topheadlines.TopHeadlinesAction.RetryButto
 import com.bruno.news.presentation.ui.topheadlines.TopHeadlinesUiState.ScreenState
 import com.bruno.news.presentation.ui.topheadlines.TopHeadlinesViewModel.ScreenEvent
 import com.bruno.news.util.rememberEndReachedState
-import com.bruno.news.util.showToast
 
 @Composable
 fun TopHeadlinesScreen(
@@ -63,7 +61,9 @@ fun TopHeadlinesScreen(
     sharedViewModel: NewsViewModel,
 ) {
     val activity = LocalContext.current as NewsActivity
-    LaunchedEffect(key1 = Unit) { viewModel.setup() }
+    LaunchedEffect(key1 = Unit) {
+        viewModel.setup()
+    }
     Screen(
         uiState = viewModel.uiState,
         onAction = viewModel::onAction

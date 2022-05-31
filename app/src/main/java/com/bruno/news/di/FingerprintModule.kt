@@ -1,7 +1,6 @@
 package com.bruno.news.di
 
 import android.app.Application
-import android.content.Context
 import androidx.biometric.BiometricManager
 import com.bruno.news.util.Fingerprint
 import com.bruno.news.util.FingerprintImpl
@@ -23,5 +22,4 @@ class FingerprintModule {
     fun provideFingerprint(biometricManager: BiometricManager, context: Application): Fingerprint {
         return FingerprintImpl(biometricManager, context)
     }
-
 }

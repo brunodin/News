@@ -1,7 +1,5 @@
 package com.bruno.news.util
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -9,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.platform.LocalContext
 
 private const val FIRST_INDEX = 0
 
@@ -30,8 +27,4 @@ fun rememberEndReachedState(onEndReached: () -> Unit): LazyListState {
             }
     }
     return scrollState
-}
-
-fun showToast(context: Context, text: String) {
-    Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
 }

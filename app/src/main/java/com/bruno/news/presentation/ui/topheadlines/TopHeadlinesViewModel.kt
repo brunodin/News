@@ -17,7 +17,6 @@ import com.bruno.news.presentation.ui.topheadlines.TopHeadlinesViewModel.ScreenE
 import com.bruno.news.util.EventFlow
 import com.bruno.news.util.EventFlowImpl
 import com.bruno.news.util.Fingerprint
-import com.bruno.news.util.FingerprintImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch

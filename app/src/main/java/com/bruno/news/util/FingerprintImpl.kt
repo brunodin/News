@@ -33,11 +33,11 @@ class FingerprintImpl @Inject constructor(
     }
 
     private fun biometricPromptCallback() = object : BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                Log.d("Fingerprint", "onAuthenticationSucceeded: Succcess")
-            }
+        override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+            super.onAuthenticationSucceeded(result)
+            Log.d("Fingerprint", "onAuthenticationSucceeded: Succcess")
         }
+    }
 
     private fun fingerprintIsAvailable(): Boolean {
         return biometricManager.canAuthenticate(BIOMETRIC_WEAK) == BIOMETRIC_SUCCESS
