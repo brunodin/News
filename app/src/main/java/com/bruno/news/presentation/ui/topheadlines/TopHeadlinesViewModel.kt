@@ -38,6 +38,7 @@ class TopHeadlinesViewModel @Inject constructor(
     }
 
     fun setup() {
+        if (this::news.isInitialized) return
         performFirstPaginationRequest()
     }
 
