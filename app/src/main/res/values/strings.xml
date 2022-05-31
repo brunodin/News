@@ -5,4 +5,11 @@
     <string name="empty_list">Ops... Não encontramos nenhuma noticia</string>
     <string name="retry">Tentar novamente</string>
     <string name="loading">Carregando ... \nAguarde um momento</string>
+    <string name="fingerprint_success">Sucesso ao obter digital</string>
+    <string name="fingerprint_failure">Ocorreu um erro ao tentar recuperar a digital</string>
+    <!--    Dialog-->
+    <string name="dialog_title">Autenticação por digital</string>
+    <string name="dialog_description">Essa autenticação é necessaria para pode prosseguir</string>
+    <string name="dialog_cancel">Cancelar</string>
+
 </resources>
